@@ -26,6 +26,7 @@ async function run() {
 
     const db = client.db("mediqueue")
     const tutorCollection = db.collection("tutors")
+    const bookingCollection = db.collection("bookings")
 
 
     app.get('/tutor',async(req,res)=>{
@@ -56,6 +57,12 @@ async function run() {
     app.delete('/tutor/:id',async(req,res)=>{
       const {id} = req.params
       const result = await tutorCollection.deleteOne({_id: new ObjectId(id)})
+      res.json(result)
+    })
+
+    app.post('/booking',async(req,res)=>{
+      const bookingData = req.body
+      const result = await bookingCollection.insertOne(bookingData)
       res.json(result)
     })
 
