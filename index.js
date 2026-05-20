@@ -53,6 +53,12 @@ async function run() {
       res.json(result)
     })
 
+    app.delete('/tutor/:id',async(req,res)=>{
+      const {id} = req.params
+      const result = await tutorCollection.deleteOne({_id: new ObjectId(id)})
+      res.json(result)
+    })
+
     app.post('/tutor', async (req,res)=>{
       const tutor = req.body
       const result = await tutorCollection.insertOne(tutor)
