@@ -32,6 +32,10 @@ async function run() {
       const result = await tutorCollection.find().limit(6).toArray();
       res.json(result)
     })
+    app.get('/tutor/all',async(req,res)=>{
+      const result = await tutorCollection.find().toArray();
+      res.json(result)
+    })
 
     app.get('/tutor/:id',async(req,res)=>{
       const {id} = req.params 
