@@ -43,6 +43,16 @@ async function run() {
       res.json(result)
     })
 
+    app.patch('/tutor/:id',async(req,res)=>{
+      const {id} = req.params;
+      const updatedData = req.body
+      const result = await tutorCollection.updateOne(
+        {_id: new ObjectId(id)},
+        {$set: updatedData}
+      )
+      res.json(result)
+    })
+
     app.post('/tutor', async (req,res)=>{
       const tutor = req.body
       const result = await tutorCollection.insertOne(tutor)
