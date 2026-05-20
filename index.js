@@ -1,14 +1,14 @@
 const dns = require("node:dns");
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
-
+const dotenv = require('dotenv')
 const express = require('express')
 const { MongoClient, ServerApiVersion } = require('mongodb');
+dotenv.config()
 const app = express();
-const PORT = 5000
-const uri = "mongodb+srv://mediquee:hRI2t5TB3qvoNey0@cluster0.zpyhg2l.mongodb.net/?appName=Cluster0";
+const PORT = process.env.PORT
+const uri = process.env.MONGODB_URI
 
-// mediquee
-// hRI2t5TB3qvoNey0
+
 const client = new MongoClient(uri, {
   serverApi: {
     version: ServerApiVersion.v1,
@@ -20,6 +20,18 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+
+    const db = client.db("mediqueue")
+    const tutorCollection = db.collection("tutors")
+
+    app.post('/tutor', async (req,res)=>{
+      const tutor = req.body
+      const result = await tutorCollection.insertOne(tutor)
+      res.json(result)
+    })
+
+
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
