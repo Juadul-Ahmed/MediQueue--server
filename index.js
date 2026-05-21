@@ -45,7 +45,7 @@ const verifyToken = async (req, res, next) => {
 
   try {
     const { payload } = await jwtVerify(token, JWKS);
-    req.user = payload; // Store payload context safely
+    req.user = payload; 
     next();
   } catch (error) {
     console.error("JWT validation error context:", error.message);
@@ -89,32 +89,68 @@ app.get('/tutor', ensureDb, async (req, res) => {
   res.json(formattedResult);
 });
 
+// app.get('/tutor/all', ensureDb, async (req, res) => {
+//   const { search, startDate, endDate } = req.query;
+//   let query = {};
+
+//   if (search) {
+//     query.$or = [
+//       { tutorName: { $regex: search, $options: 'i' } },
+//       { subject: { $regex: search, $options: 'i' } }
+//     ];
+//   }
+
+//   if (startDate || endDate) {
+//     query.sessionStartDate = {};
+//     if (startDate) query.sessionStartDate.$gte = startDate;
+//     if (endDate) query.sessionStartDate.$lte = endDate;
+//   }
+
+//   const rawResult = await tutorCollection.find(query).toArray();
+  
+//   const formattedResult = rawResult.map(tutor => ({
+//     ...tutor,
+//     totalSlots: parseInt(tutor.totalSlots) || 0, 
+//     hourlyFee: parseFloat(tutor.hourlyFee) || 0    
+//   }));
+
+//   res.json(formattedResult);
+// });
+
 app.get('/tutor/all', ensureDb, async (req, res) => {
+
   const { search, startDate, endDate } = req.query;
   let query = {};
 
-  if (search) {
+
+  if (search && search.trim() !== "") {
     query.$or = [
       { tutorName: { $regex: search, $options: 'i' } },
       { subject: { $regex: search, $options: 'i' } }
     ];
   }
 
-  if (startDate || endDate) {
+  if ((startDate && startDate.trim() !== "") || (endDate && endDate.trim() !== "")) {
     query.sessionStartDate = {};
-    if (startDate) query.sessionStartDate.$gte = startDate;
-    if (endDate) query.sessionStartDate.$lte = endDate;
+    if (startDate && startDate.trim() !== "") query.sessionStartDate.$gte = startDate;
+    if (endDate && endDate.trim() !== "") query.sessionStartDate.$lte = endDate;
   }
 
-  const rawResult = await tutorCollection.find(query).toArray();
-  
-  const formattedResult = rawResult.map(tutor => ({
-    ...tutor,
-    totalSlots: parseInt(tutor.totalSlots) || 0, 
-    hourlyFee: parseFloat(tutor.hourlyFee) || 0    
-  }));
+  try {
+   
+    const rawResult = await tutorCollection.find(query).toArray();
+    
+    const formattedResult = rawResult.map(tutor => ({
+      ...tutor,
+      totalSlots: parseInt(tutor.totalSlots) || 0, 
+      hourlyFee: parseFloat(tutor.hourlyFee) || 0    
+    }));
 
-  res.json(formattedResult);
+    res.json(formattedResult);
+  } catch (err) {
+    console.error("Search directory error:", err);
+    res.status(500).json({ error: "Failed to query directory data records." });
+  }
 });
 
 
