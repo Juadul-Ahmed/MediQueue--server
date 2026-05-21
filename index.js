@@ -154,7 +154,7 @@ app.get('/tutor/all', ensureDb, async (req, res) => {
 });
 
 
-app.get('/tutor/:id', ensureDb, verifyToken, async (req, res) => {
+app.get('/tutor/:id', ensureDb,  async (req, res) => {
   const { id } = req.params;
   try {
     const result = await tutorCollection.findOne({ _id: new ObjectId(id) });
